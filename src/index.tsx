@@ -1,11 +1,10 @@
 import React from "react";
 import {Tag} from "./components/Tag";
 import {classSelectors} from "./utils/selectors";
-import {generateUniqueKey} from "./utils/functions";
 
 type Tags = string[];
 
-interface Props {
+export interface ReactTagInputProps {
   tags: Tags;
   onChange: (tags: Tags) => void;
   placeholder?: string;
@@ -20,30 +19,12 @@ interface State {
   input: string;
 }
 
-export default class ReactTagInput extends React.Component<Props, State> {
+export default class ReactTagInput extends React.Component<ReactTagInputProps, State> {
 
-  // Keys stores the unique key prop for each tag
-  keys: string[] = [];
+  state = { input: "" };
 
-  // Ref to the input element
-  inputRef: React.RefObject<HTMLInputElement>;
-
-  constructor(props: Props) {
-
-    super(props);
-
-    // Generate keys for each initial tag
-    this.keys = this.props.tags.map(() => generateUniqueKey());
-
-    // Create input ref
-    this.inputRef = React.createRef();
-
-    // Define initial state
-    this.state = {
-      input: "",
-    };
-
-  }
+  // Ref for input element
+  inputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
   onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ input: e.target.value });
@@ -91,7 +72,6 @@ export default class ReactTagInput extends React.Component<Props, State> {
   addTag = (value: string) => {
     const tags = [ ...this.props.tags ];
     tags.push(value);
-    this.keys[tags.length - 1] = generateUniqueKey();
     this.props.onChange(tags);
     this.setState({ input: "" });
   }
@@ -99,7 +79,6 @@ export default class ReactTagInput extends React.Component<Props, State> {
   removeTag = (i: number) => {
     const tags = [ ...this.props.tags ];
     tags.splice(i, 1);
-    this.keys.splice(i, 1);
     this.props.onChange(tags);
   }
 
@@ -107,26 +86,6 @@ export default class ReactTagInput extends React.Component<Props, State> {
     const tags = [...this.props.tags];
     tags[i] = value;
     this.props.onChange(tags);
-  }
-
-  shouldComponentUpdate(nextProps: Readonly<Props>) {
-
-    // Before component re-renders, remove or add required unique keys
-    const { tags } = this.props;
-    const nextTags = nextProps.tags;
-    const tagLengthDifference = nextTags.length - tags.length;
-    if (tagLengthDifference > 0) {
-      for (let i = tags.length - 1; i < (tags.length + tagLengthDifference); i++) {
-        this.keys[i] = generateUniqueKey();
-      }
-    }
-    else if (tagLengthDifference < 0) {
-      const startDelete = (tags.length + tagLengthDifference);
-      const deleteCount = tags.length - startDelete;
-      this.keys.splice(startDelete, deleteCount);
-    }
-    return true;
-
   }
 
   render() {

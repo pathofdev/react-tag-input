@@ -10,6 +10,8 @@ lerna-debug.log*
 
 .idea/
 
+dist/
+
 keys/
 
 # Diagnostic reports (https://nodejs.org/api/report.html)

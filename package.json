@@ -1,41 +1,44 @@
 {
-  "name": "@ezauth/react-tag-input",
+  "name": "@pathofdev/react-tag-input",
   "version": "1.0.0",
-  "description": "",
-  "main": "./dist/umd/untrusive.min.js",
-  "module": "./dist/module/index.js",
-  "types": "./dist/module/index.d.ts",
+  "description": "A simple tag input component for React",
+  "main": "./build/umd/index.min.js",
+  "module": "./build/module/index.js",
+  "types": "./build/module/index.d.ts",
+  "private": false,
+  "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/path-of-dev/untrusive"
+    "url": "https://github.com/path-of-dev/react-tag-input"
   },
   "scripts": {
-    "prepublishOnly": "npm run build",
-    "publishCmd": "npm publish --access public",
-    "umd-build": "rollup ./dist/module/index.js --format umd -m --name 'Untrusive' --file ./dist/umd/untrusive.js",
-    "umd-minify": "uglifyjs ./dist/umd/untrusive.js -o ./dist/umd/untrusive.min.js --source-map url",
     "module-build": "tsc",
-    "build": "rm -rf dist && npm run module-build && npm run umd-build && npm run umd-minify && cp ./dist/umd/untrusive.min.js ./demo && npm shrinkwrap --dev",
-    "demo": "parcel ./demo/index.html"
+    "umd-build": "rollup ./build/module/index.js --format umd -m --name 'ReactTagInput' -g react:React --file ./build/umd/index.js",
+    "umd-minify": "uglifyjs ./build/umd/index.js -o ./build/umd/index.min.js --source-map url",
+    "scss-build": "sass src/styles/index.scss build/index.css --style compressed --source-map",
+    "build": "rm -rf build && npm run module-build && npm run umd-build && npm run umd-minify && npm run scss-build && npm shrinkwrap --dev",
+    "push": "git push origin master --tags && npm run publish",
+    "example": "parcel ./example/index.html"
   },
   "keywords": [
-    "css loader",
-    "loader",
-    "indeterminate loading bar",
-    "indeterminate loader"
+    "tag input",
+    "react",
+    "react tag input",
+    "react input tag"
   ],
   "author": "pathof.dev",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^12.7.1",
     "@types/react": "^16.8.25",
     "@types/react-dom": "^16.8.5",
     "parcel": "^1.12.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "sass": "^1.22.9",
+    "rollup": "^1.19.4",
+    "sass": "^1.2.3",
     "tslint": "^5.18.0",
     "tslint-language-service": "^0.9.9",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "uglify-js": "^3.6.0"
   }
 }

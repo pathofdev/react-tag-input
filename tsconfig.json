@@ -3,7 +3,7 @@
         
         "baseUrl": ".",
         "rootDir": "./src",
-        "outDir": "./dist/module",
+        "outDir": "./build/module",
         "sourceMap": true,
         "inlineSources": true,
         "declaration": true,
@@ -12,9 +12,10 @@
         "module": "es6",
         "target": "es5",
         "lib": [ "es5", "dom" ],
+        "jsx": "react",
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
-        "jsx": "react",
+        "moduleResolution": "node",
 
         /* Strict Type-Checking Options */
         "strict": true,

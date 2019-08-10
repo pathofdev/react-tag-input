@@ -1,0 +1,1 @@
+{"version":3,"file":"functions.js","sourceRoot":"","sources":["../../../src/utils/functions.tsx"],"names":[],"mappings":"AACA,MAAM,UAAU,gBAAgB,CAAC,KAAa;IAC5C,OAAO,KAAK,CAAC,OAAO,CAAC,gBAAgB,EAAE,EAAE,CAAC,CAAC;AAC7C,CAAC","sourcesContent":["\nexport function removeLineBreaks(value: string) {\n  return value.replace(/(\\r\\n|\\n|\\r)/gm, \"\");\n}\n"]}
