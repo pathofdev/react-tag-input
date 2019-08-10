@@ -1,0 +1,53 @@
+{
+    "compilerOptions": {
+        
+        "baseUrl": ".",
+        "rootDir": "./src",
+        "outDir": "./dist/module",
+        "sourceMap": true,
+        "inlineSources": true,
+        "declaration": true,
+
+        /* MODULES */
+        "module": "es6",
+        "target": "es5",
+        "lib": [ "es5", "dom" ],
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "jsx": "react",
+
+        /* Strict Type-Checking Options */
+        "strict": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "noImplicitThis": true,
+        "alwaysStrict": true,
+        "forceConsistentCasingInFileNames": true,
+        "removeComments": true,
+        "experimentalDecorators": true,
+
+        /* Additional Checks */
+        "noUnusedLocals": false, /* Report errors on unused locals. */
+        "noUnusedParameters": false, /* Report errors on unused parameters. */
+        "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
+        "noFallthroughCasesInSwitch": true,
+        
+        "plugins": [
+            {
+                "name": "tslint-language-service",
+                "disableNoUnusedVariableRule": false,
+                "supressWhileTypeErrorsPresent": false
+            }
+        ]
+
+    },
+
+    "include": [
+        "./src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+    
+}

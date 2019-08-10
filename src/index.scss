@@ -1,0 +1,117 @@
+
+$reactTagColorGray: #e1e1e1;
+$reactTagColorText: #333;
+$reactTagHeight: 2.375em;
+$reactTagFontSize: 1em;
+$reactTagBorderRadius: 3px;
+$reactTagMarginPadding: 0.1875em;
+
+.react-tag-input {
+
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: $reactTagHeight;
+  padding: $reactTagMarginPadding $reactTagMarginPadding * 2;
+  overflow-y: auto;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  font-size: 1rem;
+  background: white;
+  color: $reactTagColorText;
+  border: 1px solid $reactTagColorGray;
+  border-radius: $reactTagBorderRadius;
+
+  * { box-sizing: border-box; }
+
+  > * { margin: $reactTagMarginPadding; }
+
+  @at-root #{&}__input {
+
+    width: auto;
+    flex-grow: 1;
+    height: $reactTagHeight - 0.5;
+    padding: 0 0 0 $reactTagMarginPadding;
+    margin: 0 $reactTagMarginPadding;
+
+    font-size: $reactTagFontSize;
+    line-height: 1;
+
+    background: transparent;
+    color: $reactTagColorText;
+    border: none;
+    border-radius: $reactTagBorderRadius;
+    outline: 0;
+    box-shadow: none;
+    -webkit-appearance: none;
+
+    &:-moz-placeholder, &:-ms-input-placeholder, &::-moz-placeholder, &::-webkit-input-placeholder {
+      color: $reactTagColorText;
+    }
+    &:focus {
+      border: none;
+    }
+
+  }
+
+  @at-root #{&}__tag {
+    position: relative;
+    display: flex;
+    align-items: center;
+    font-size: $reactTagFontSize - 0.15;
+    line-height: 1;
+    background: $reactTagColorGray;
+    border-radius: $reactTagBorderRadius;
+  }
+
+  @at-root #{&}__tag__content {
+    outline: 0;
+    border: none;
+    white-space: nowrap;
+    padding: 0 $reactTagMarginPadding * 2.5;
+  }
+
+  @at-root #{&}__tag__remove {
+
+    position: relative;
+    height: $reactTagFontSize * 2;
+    width: $reactTagFontSize * 2;
+
+    font-size: $reactTagFontSize - 0.15;
+    cursor: pointer;
+    background: darken($reactTagColorGray, 5%);
+    border-top-right-radius: $reactTagBorderRadius;
+    border-bottom-right-radius: $reactTagBorderRadius;
+
+    &:before, &:after {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      content: ' ';
+      height: $reactTagFontSize - 0.1;
+      width: 0.15em;
+      background-color: $reactTagColorText;
+    }
+    &:before {
+      transform: translateX(-50%) translateY(-50%) rotate(45deg);
+    }
+    &:after {
+      transform: translateX(-50%) translateY(-50%) rotate(-45deg);
+    }
+
+
+    @at-root #{&}-readonly {
+      width: 0;
+      &:before, &:after {
+        content: '';
+        width: 0;
+      }
+    }
+
+  }
+
+}
