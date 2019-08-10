@@ -25815,12 +25815,12 @@ function reloadCSS() {
 }
 
 module.exports = reloadCSS;
-},{"./bundle-url":"../node_modules/parcel/src/builtins/bundle-url.js"}],"../src/index.scss":[function(require,module,exports) {
+},{"./bundle-url":"../node_modules/parcel/src/builtins/bundle-url.js"}],"../src/styles/index.scss":[function(require,module,exports) {
 var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"_css_loader":"../node_modules/parcel/src/builtins/css-loader.js"}],"../src/selectors.tsx":[function(require,module,exports) {
+},{"_css_loader":"../node_modules/parcel/src/builtins/css-loader.js"}],"../src/utils/selectors.tsx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -25836,32 +25836,14 @@ var classSelectors = {
   tagRemoveReadOnly: "react-tag-input__tag__remove-readonly"
 };
 exports.classSelectors = classSelectors;
-},{}],"../src/utils.tsx":[function(require,module,exports) {
+},{}],"../src/utils/functions.tsx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.escapeHtml = escapeHtml;
 exports.generateUniqueKey = generateUniqueKey;
 exports.removeLineBreaks = removeLineBreaks;
-exports.safeInputText = safeInputText;
-var htmlEntityMap = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;",
-  "/": "&#x2F;",
-  "`": "&#x60;",
-  "=": "&#x3D;"
-};
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"'`=\/]/g, function (s) {
-    return htmlEntityMap[s];
-  });
-}
 
 function generateUniqueKey() {
   return Math.random().toString(36).substr(2, 9);
@@ -25870,12 +25852,7 @@ function generateUniqueKey() {
 function removeLineBreaks(value) {
   return value.replace(/(\r\n|\n|\r)/gm, "");
 }
-
-function safeInputText(value) {
-  value = escapeHtml(value);
-  return removeLineBreaks(value);
-}
-},{}],"../src/ContentEditable.tsx":[function(require,module,exports) {
+},{}],"../src/components/ContentEditable.tsx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -25885,7 +25862,7 @@ exports.ContentEditable = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
-var _utils = require("./utils");
+var _functions = require("../utils/functions");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -25918,57 +25895,48 @@ var __extends = void 0 && (void 0).__extends || function () {
 var ContentEditable = function (_super) {
   __extends(ContentEditable, _super);
 
-  function ContentEditable(props) {
-    var _this = _super.call(this, props) || this;
+  function ContentEditable() {
+    var _this = _super !== null && _super.apply(this, arguments) || this;
 
     _this.focused = false;
     _this.removed = false;
+    _this.preFocusedValue = "";
 
     _this.onPaste = function (e) {
       e.preventDefault();
       var text = e.clipboardData.getData("text/plain");
-      document.execCommand("insertHTML", false, (0, _utils.safeInputText)(text));
-    };
-
-    _this.focusInputRef = function () {
-      var inputRef = _this.props.inputRef;
-
-      if (inputRef && inputRef.current) {
-        inputRef.current.focus();
-      }
+      document.execCommand("insertHTML", false, (0, _functions.removeLineBreaks)(text));
     };
 
     _this.onFocus = function () {
-      _this.preFocusedValue = _this.props.value;
+      _this.preFocusedValue = _this.getValue();
       _this.focused = true;
     };
 
     _this.onBlur = function () {
       _this.focused = false;
-      var ref = _this.ref.current;
+      var ref = _this.props.innerEditableRef.current;
       var _a = _this.props,
-          value = _a.value,
           validator = _a.validator,
           change = _a.change;
 
-      if (ref && ref.innerText === "" && !_this.removed) {
-        _this.props.remove();
-      } else if (!_this.removed && validator) {
-        var valid = validator(value);
+      if (!_this.removed && ref) {
+        if (ref.innerText === "") {
+          _this.props.remove();
 
-        if (!valid) {
-          change(_this.preFocusedValue);
+          return;
+        }
 
-          if (ref) {
+        if (validator) {
+          var valid = validator(_this.getValue());
+
+          if (!valid) {
             ref.innerText = _this.preFocusedValue;
+            return;
           }
         }
-      }
-    };
 
-    _this.onInput = function () {
-      if (_this.ref.current) {
-        _this.props.change(_this.ref.current.innerText);
+        change(ref.innerText);
       }
     };
 
@@ -25982,38 +25950,53 @@ var ContentEditable = function (_super) {
       }
 
       var removeOnBackspace = _this.props.removeOnBackspace;
-      var ref = _this.ref.current;
 
-      if (removeOnBackspace && ref && e.keyCode === 8 && ref.innerText === "") {
+      var value = _this.getValue();
+
+      if (removeOnBackspace && e.keyCode === 8 && value === "") {
         _this.removed = true;
 
         _this.props.remove();
 
         _this.focusInputRef();
+
+        return;
       }
     };
 
-    var value = (0, _utils.safeInputText)(_this.props.value);
-    _this.value = value;
-    _this.preFocusedValue = value;
-    _this.ref = _react.default.createRef();
+    _this.getValue = function () {
+      var ref = _this.getRef();
+
+      return ref ? ref.innerText : "";
+    };
+
+    _this.getRef = function () {
+      return _this.props.innerEditableRef.current;
+    };
+
+    _this.focusInputRef = function () {
+      var inputRef = _this.props.inputRef;
+
+      if (inputRef && inputRef.current) {
+        inputRef.current.focus();
+      }
+    };
+
     return _this;
   }
 
+  ContentEditable.prototype.componentDidMount = function () {
+    this.preFocusedValue = this.getValue();
+  };
+
   ContentEditable.prototype.render = function () {
     var _a = this.props,
-        value = _a.value,
-        className = _a.className;
-    var content = (0, _utils.safeInputText)(this.focused ? this.value : value);
-    console.log("RENDER CONTENT", value);
+        className = _a.className,
+        innerEditableRef = _a.innerEditableRef;
     return _react.default.createElement("div", {
-      ref: this.ref,
+      ref: innerEditableRef,
       className: className,
       contentEditable: true,
-      dangerouslySetInnerHTML: {
-        __html: value
-      },
-      onInput: this.onInput,
       onPaste: this.onPaste,
       onFocus: this.onFocus,
       onBlur: this.onBlur,
@@ -26025,7 +26008,7 @@ var ContentEditable = function (_super) {
 }(_react.default.Component);
 
 exports.ContentEditable = ContentEditable;
-},{"react":"../node_modules/react/index.js","./utils":"../src/utils.tsx"}],"../src/tag.tsx":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","../utils/functions":"../src/utils/functions.tsx"}],"../src/components/Tag.tsx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -26035,9 +26018,11 @@ exports.Tag = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
-var _selectors = require("./selectors");
+var _selectors = require("../utils/selectors");
 
 var _ContentEditable = require("./ContentEditable");
+
+var _functions = require("../utils/functions");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -26073,6 +26058,8 @@ var Tag = function (_super) {
   function Tag() {
     var _this = _super !== null && _super.apply(this, arguments) || this;
 
+    _this.innerEditableRef = _react.default.createRef();
+
     _this.remove = function () {
       return _this.props.remove(_this.props.index);
     };
@@ -26080,13 +26067,31 @@ var Tag = function (_super) {
     return _this;
   }
 
+  Tag.prototype.componentDidMount = function () {
+    var ref = this.innerEditableRef.current;
+
+    if (ref) {
+      ref.innerText = (0, _functions.removeLineBreaks)(this.props.value);
+    }
+  };
+
+  Tag.prototype.componentDidUpdate = function (prevProps, prevState, snapshot) {
+    var ref = this.innerEditableRef.current;
+
+    if (ref && prevProps.value !== this.props.value) {
+      ref.innerText = (0, _functions.removeLineBreaks)(this.props.value);
+    }
+  };
+
   Tag.prototype.shouldComponentUpdate = function (nextProps, nextState, nextContext) {
-    return nextProps.tag !== this.props.tag || nextProps.index !== this.props.index;
+    var changedValue = nextProps.value !== this.props.value;
+    var changedIndex = nextProps.index !== this.props.index;
+    return changedValue || changedIndex;
   };
 
   Tag.prototype.render = function () {
     var _a = this.props,
-        tag = _a.tag,
+        value = _a.value,
         index = _a.index,
         editable = _a.editable,
         inputRef = _a.inputRef,
@@ -26094,22 +26099,23 @@ var Tag = function (_super) {
         update = _a.update,
         readOnly = _a.readOnly,
         removeOnBackspace = _a.removeOnBackspace;
+    var tagRemoveClass = !readOnly ? _selectors.classSelectors.tagRemove : _selectors.classSelectors.tagRemove + " " + _selectors.classSelectors.tagRemoveReadOnly;
     return _react.default.createElement("div", {
       className: _selectors.classSelectors.tag
     }, !editable && _react.default.createElement("div", {
       className: _selectors.classSelectors.tagContent
-    }, tag), editable && _react.default.createElement(_ContentEditable.ContentEditable, {
-      value: tag,
+    }, value), editable && _react.default.createElement(_ContentEditable.ContentEditable, {
       inputRef: inputRef,
+      innerEditableRef: this.innerEditableRef,
       className: _selectors.classSelectors.tagContent,
-      change: function change(value) {
-        return update(index, value);
+      change: function change(newValue) {
+        return update(index, newValue);
       },
       remove: this.remove,
       validator: validator,
       removeOnBackspace: removeOnBackspace
     }), _react.default.createElement("div", {
-      className: _selectors.classSelectors.tagRemove + " " + (readOnly ? _selectors.classSelectors.tagRemoveReadOnly : ""),
+      className: tagRemoveClass,
       onClick: this.remove
     }));
   };
@@ -26118,7 +26124,7 @@ var Tag = function (_super) {
 }(_react.default.Component);
 
 exports.Tag = Tag;
-},{"react":"../node_modules/react/index.js","./selectors":"../src/selectors.tsx","./ContentEditable":"../src/ContentEditable.tsx"}],"../src/index.tsx":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","../utils/selectors":"../src/utils/selectors.tsx","./ContentEditable":"../src/components/ContentEditable.tsx","../utils/functions":"../src/utils/functions.tsx"}],"../src/index.tsx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -26128,11 +26134,11 @@ exports.default = void 0;
 
 var _react = _interopRequireDefault(require("react"));
 
-var _tag = require("./tag");
+var _Tag = require("./components/Tag");
 
-var _selectors = require("./selectors");
+var _selectors = require("./utils/selectors");
 
-var _utils = require("./utils");
+var _functions = require("./utils/functions");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -26209,7 +26215,7 @@ var ReactTagInput = function (_super) {
       var tags = _this.props.tags.slice();
 
       tags.push(value);
-      _this.keys[tags.length - 1] = (0, _utils.generateUniqueKey)();
+      _this.keys[tags.length - 1] = (0, _functions.generateUniqueKey)();
 
       _this.props.onChange(tags);
 
@@ -26237,7 +26243,7 @@ var ReactTagInput = function (_super) {
     };
 
     _this.keys = _this.props.tags.map(function () {
-      return (0, _utils.generateUniqueKey)();
+      return (0, _functions.generateUniqueKey)();
     });
     _this.inputRef = _react.default.createRef();
     _this.state = {
@@ -26253,7 +26259,7 @@ var ReactTagInput = function (_super) {
 
     if (tagLengthDifference > 0) {
       for (var i = tags.length - 1; i < tags.length + tagLengthDifference; i++) {
-        this.keys[i] = (0, _utils.generateUniqueKey)();
+        this.keys[i] = (0, _functions.generateUniqueKey)();
       }
     } else if (tagLengthDifference < 0) {
       var startDelete = tags.length + tagLengthDifference;
@@ -26282,9 +26288,9 @@ var ReactTagInput = function (_super) {
     return _react.default.createElement("div", {
       className: _selectors.classSelectors.wrapper
     }, tags.map(function (tag, i) {
-      return _react.default.createElement(_tag.Tag, {
-        key: _this.keys[i],
-        tag: tag,
+      return _react.default.createElement(_Tag.Tag, {
+        key: i,
+        value: tag,
         index: i,
         editable: isEditable,
         readOnly: readOnly || false,
@@ -26309,14 +26315,14 @@ var ReactTagInput = function (_super) {
 
 var _default = ReactTagInput;
 exports.default = _default;
-},{"react":"../node_modules/react/index.js","./tag":"../src/tag.tsx","./selectors":"../src/selectors.tsx","./utils":"../src/utils.tsx"}],"index.tsx":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","./components/Tag":"../src/components/Tag.tsx","./utils/selectors":"../src/utils/selectors.tsx","./utils/functions":"../src/utils/functions.tsx"}],"index.tsx":[function(require,module,exports) {
 "use strict";
 
 var _react = _interopRequireDefault(require("react"));
 
 var _reactDom = _interopRequireDefault(require("react-dom"));
 
-require("../src/index.scss");
+require("../src/styles/index.scss");
 
 var _index2 = _interopRequireDefault(require("../src/index"));
 
@@ -26342,6 +26348,24 @@ function Demo() {
     onChange: function onChange(value) {
       return setTags(value);
     }
+  }), _react.default.createElement("h2", null, "Editable Validator Email Only"), _react.default.createElement(_index2.default, {
+    tags: tags,
+    editable: true,
+    validator: function validator(v) {
+      var valid = v.indexOf("@") !== -1;
+
+      if (!valid) {
+        alert("Please enter an email");
+        return false;
+      }
+
+      return true;
+    },
+    onChange: function onChange(value) {
+      console.log("EDITABLE VALUE", value);
+      setTags(value);
+    },
+    removeOnBackspace: true
   }), false && _react.default.createElement(_react.default.Fragment, null, _react.default.createElement("h2", null, "Editable Validator Email Only"), _react.default.createElement(_index2.default, {
     tags: tags,
     editable: true,
@@ -26403,7 +26427,7 @@ function Demo() {
 }
 
 _reactDom.default.render(_react.default.createElement(Demo, null), root);
-},{"react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","../src/index.scss":"../src/index.scss","../src/index":"../src/index.tsx"}],"../node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"react":"../node_modules/react/index.js","react-dom":"../node_modules/react-dom/index.js","../src/styles/index.scss":"../src/styles/index.scss","../src/index":"../src/index.tsx"}],"../node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -26431,7 +26455,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "37271" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38093" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

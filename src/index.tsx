@@ -1,7 +1,7 @@
 import React from "react";
-import {Tag} from "./tag";
-import {classSelectors} from "./selectors";
-import {generateUniqueKey} from "./utils";
+import {Tag} from "./components/Tag";
+import {classSelectors} from "./utils/selectors";
+import {generateUniqueKey} from "./utils/functions";
 
 type Tags = string[];
 
@@ -110,6 +110,8 @@ export default class ReactTagInput extends React.Component<Props, State> {
   }
 
   shouldComponentUpdate(nextProps: Readonly<Props>) {
+
+    // Before component re-renders, remove or add required unique keys
     const { tags } = this.props;
     const nextTags = nextProps.tags;
     const tagLengthDifference = nextTags.length - tags.length;
@@ -124,11 +126,10 @@ export default class ReactTagInput extends React.Component<Props, State> {
       this.keys.splice(startDelete, deleteCount);
     }
     return true;
+
   }
 
   render() {
-
-    // console.log(this.keys);
 
     const { input } = this.state;
 
@@ -144,8 +145,8 @@ export default class ReactTagInput extends React.Component<Props, State> {
       <div className={classSelectors.wrapper}>
         {tags.map((tag, i) => (
           <Tag
-            key={this.keys[i]}
-            tag={tag}
+            key={i}
+            value={tag}
             index={i}
             editable={isEditable}
             readOnly={readOnly || false}

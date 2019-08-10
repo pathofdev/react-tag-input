@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "../src/index.scss";
+import "../src/styles/index.scss";
 import Tags from "../src/index";
 
 const root = document.getElementById("root");
@@ -23,6 +23,25 @@ function Demo() {
         tags={tags}
         editable={true}
         onChange={(value) => setTags(value)}
+      />
+
+      <h2>Editable Validator Email Only</h2>
+      <Tags
+        tags={tags}
+        editable={true}
+        validator={(v) => {
+          const valid = v.indexOf("@") !== -1;
+          if (!valid) {
+            alert("Please enter an email");
+            return false;
+          }
+          return true;
+        }}
+        onChange={(value) => {
+          console.log("EDITABLE VALUE", value);
+          setTags(value);
+        }}
+        removeOnBackspace={true}
       />
 
       {false && (
