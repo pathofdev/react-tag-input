@@ -15,7 +15,7 @@ interface Props {
   removeOnBackspace?: boolean;
 }
 
-export class Tag extends React.Component<Props> {
+export class Tag extends React.PureComponent<Props> {
 
   innerEditableRef: React.RefObject<HTMLDivElement> = React.createRef();
 
@@ -31,12 +31,6 @@ export class Tag extends React.Component<Props> {
     if (ref && prevProps.value !== this.props.value) {
       ref.innerText = removeLineBreaks(this.props.value);
     }
-  }
-
-  shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<{}>, nextContext: any): boolean {
-    const changedValue = nextProps.value !== this.props.value;
-    const changedIndex = nextProps.index !== this.props.index;
-    return (changedValue || changedIndex);
   }
 
   remove = () => this.props.remove(this.props.index);

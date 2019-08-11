@@ -17,7 +17,7 @@
     "umd-minify": "uglifyjs ./build/umd/index.js -o ./build/umd/index.min.js --source-map url",
     "scss-build": "sass src/styles/index.scss build/index.css --style compressed --source-map",
     "build": "rm -rf build && npm run module-build && npm run umd-build && npm run umd-minify && npm run scss-build && npm shrinkwrap --dev",
-    "push": "git push origin master --tags && npm run publish",
+    "push": "git push origin master --tags && npm publish",
     "example": "parcel ./example/index.html"
   },
   "keywords": [

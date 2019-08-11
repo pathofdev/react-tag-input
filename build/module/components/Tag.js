@@ -35,11 +35,6 @@ var Tag = (function (_super) {
             ref.innerText = removeLineBreaks(this.props.value);
         }
     };
-    Tag.prototype.shouldComponentUpdate = function (nextProps, nextState, nextContext) {
-        var changedValue = nextProps.value !== this.props.value;
-        var changedIndex = nextProps.index !== this.props.index;
-        return (changedValue || changedIndex);
-    };
     Tag.prototype.render = function () {
         var _a = this.props, value = _a.value, index = _a.index, editable = _a.editable, inputRef = _a.inputRef, validator = _a.validator, update = _a.update, readOnly = _a.readOnly, removeOnBackspace = _a.removeOnBackspace;
         var tagRemoveClass = !readOnly ?
@@ -50,6 +45,6 @@ var Tag = (function (_super) {
             React.createElement("div", { className: tagRemoveClass, onClick: this.remove })));
     };
     return Tag;
-}(React.Component));
+}(React.PureComponent));
 export { Tag };
 //# sourceMappingURL=Tag.js.map
