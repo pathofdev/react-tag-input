@@ -23,13 +23,20 @@ export class Tag extends React.PureComponent<Props> {
     const ref = this.innerEditableRef.current;
     if (ref) {
       ref.innerText = removeLineBreaks(this.props.value);
+      console.log("componentDidMount", ref.innerText);
     }
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any) {
     const ref = this.innerEditableRef.current;
-    if (ref && prevProps.value !== this.props.value) {
-      ref.innerText = removeLineBreaks(this.props.value);
+    if (ref) {
+      const changedValue = prevProps.value !== this.props.value;
+      const changedEditable = prevProps.editable !== this.props.editable;
+      const update = changedValue || changedEditable;
+      if (update) {
+        ref.innerText = removeLineBreaks(this.props.value);
+        console.log("componentDidUpdate", ref.innerText);
+      }
     }
   }
 
