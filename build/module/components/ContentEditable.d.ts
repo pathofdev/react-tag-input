@@ -1,5 +1,6 @@
 import React from "react";
 interface Props {
+    value: string;
     className: string;
     innerEditableRef: React.RefObject<HTMLDivElement>;
     inputRef: React.RefObject<HTMLInputElement>;

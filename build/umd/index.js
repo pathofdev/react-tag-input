@@ -18,6 +18,24 @@
     function removeLineBreaks(value) {
         return value.replace(/(\r\n|\n|\r)/gm, "");
     }
+    var htmlEntityMap = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+        "/": "&#x2F;",
+        "`": "&#x60;",
+        "=": "&#x3D;",
+    };
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"'`=\/]/g, function (s) {
+            return htmlEntityMap[s];
+        });
+    }
+    function safeHtmlString(value) {
+        return escapeHtml(removeLineBreaks(value));
+    }
 
     var __extends = (undefined && undefined.__extends) || (function () {
         var extendStatics = function (d, b) {
@@ -42,7 +60,7 @@
             _this.onPaste = function (e) {
                 e.preventDefault();
                 var text = e.clipboardData.getData("text/plain");
-                document.execCommand("insertHTML", false, removeLineBreaks(text));
+                document.execCommand("insertHTML", false, safeHtmlString(text));
             };
             _this.onFocus = function () {
                 _this.preFocusedValue = _this.getValue();
@@ -101,8 +119,8 @@
             this.preFocusedValue = this.getValue();
         };
         ContentEditable.prototype.render = function () {
-            var _a = this.props, className = _a.className, innerEditableRef = _a.innerEditableRef;
-            return (React.createElement("div", { ref: innerEditableRef, className: className, contentEditable: true, onPaste: this.onPaste, onFocus: this.onFocus, onBlur: this.onBlur, onKeyDown: this.onKeyDown }));
+            var _a = this.props, value = _a.value, className = _a.className, innerEditableRef = _a.innerEditableRef;
+            return (React.createElement("div", { ref: innerEditableRef, className: className, contentEditable: true, onPaste: this.onPaste, onFocus: this.onFocus, onBlur: this.onBlur, onKeyDown: this.onKeyDown, dangerouslySetInnerHTML: { __html: safeHtmlString(value) } }));
         };
         return ContentEditable;
     }(React.Component));
@@ -128,34 +146,17 @@
             _this.remove = function () { return _this.props.remove(_this.props.index); };
             return _this;
         }
-        Tag.prototype.componentDidMount = function () {
-            var ref = this.innerEditableRef.current;
-            if (ref) {
-                ref.innerText = removeLineBreaks(this.props.value);
-            }
-        };
-        Tag.prototype.componentDidUpdate = function (prevProps, prevState, snapshot) {
-            var ref = this.innerEditableRef.current;
-            if (ref) {
-                var changedValue = prevProps.value !== this.props.value;
-                var changedEditable = prevProps.editable !== this.props.editable;
-                var update = changedValue || changedEditable;
-                if (update) {
-                    ref.innerText = removeLineBreaks(this.props.value);
-                }
-            }
-        };
         Tag.prototype.render = function () {
             var _a = this.props, value = _a.value, index = _a.index, editable = _a.editable, inputRef = _a.inputRef, validator = _a.validator, update = _a.update, readOnly = _a.readOnly, removeOnBackspace = _a.removeOnBackspace;
             var tagRemoveClass = !readOnly ?
                 classSelectors.tagRemove : classSelectors.tagRemove + " " + classSelectors.tagRemoveReadOnly;
             return (React.createElement("div", { className: classSelectors.tag },
                 !editable && React.createElement("div", { className: classSelectors.tagContent }, value),
-                editable && (React.createElement(ContentEditable, { inputRef: inputRef, innerEditableRef: this.innerEditableRef, className: classSelectors.tagContent, change: function (newValue) { return update(index, newValue); }, remove: this.remove, validator: validator, removeOnBackspace: removeOnBackspace })),
+                editable && (React.createElement(ContentEditable, { value: value, inputRef: inputRef, innerEditableRef: this.innerEditableRef, className: classSelectors.tagContent, change: function (newValue) { return update(index, newValue); }, remove: this.remove, validator: validator, removeOnBackspace: removeOnBackspace })),
                 React.createElement("div", { className: tagRemoveClass, onClick: this.remove })));
         };
         return Tag;
-    }(React.PureComponent));
+    }(React.Component));
 
     var __extends$2 = (undefined && undefined.__extends) || (function () {
         var extendStatics = function (d, b) {

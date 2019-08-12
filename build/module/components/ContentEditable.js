@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import React from "react";
-import { removeLineBreaks } from "../utils/functions";
+import { safeHtmlString } from "../utils/functions";
 var ContentEditable = (function (_super) {
     __extends(ContentEditable, _super);
     function ContentEditable() {
@@ -23,7 +23,7 @@ var ContentEditable = (function (_super) {
         _this.onPaste = function (e) {
             e.preventDefault();
             var text = e.clipboardData.getData("text/plain");
-            document.execCommand("insertHTML", false, removeLineBreaks(text));
+            document.execCommand("insertHTML", false, safeHtmlString(text));
         };
         _this.onFocus = function () {
             _this.preFocusedValue = _this.getValue();
@@ -82,8 +82,8 @@ var ContentEditable = (function (_super) {
         this.preFocusedValue = this.getValue();
     };
     ContentEditable.prototype.render = function () {
-        var _a = this.props, className = _a.className, innerEditableRef = _a.innerEditableRef;
-        return (React.createElement("div", { ref: innerEditableRef, className: className, contentEditable: true, onPaste: this.onPaste, onFocus: this.onFocus, onBlur: this.onBlur, onKeyDown: this.onKeyDown }));
+        var _a = this.props, value = _a.value, className = _a.className, innerEditableRef = _a.innerEditableRef;
+        return (React.createElement("div", { ref: innerEditableRef, className: className, contentEditable: true, onPaste: this.onPaste, onFocus: this.onFocus, onBlur: this.onBlur, onKeyDown: this.onKeyDown, dangerouslySetInnerHTML: { __html: safeHtmlString(value) } }));
     };
     return ContentEditable;
 }(React.Component));

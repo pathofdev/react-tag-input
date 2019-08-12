@@ -1,7 +1,8 @@
 import React from "react";
-import {removeLineBreaks} from "../utils/functions";
+import {safeHtmlString} from "../utils/functions";
 
 interface Props {
+  value: string;
   className: string;
   innerEditableRef: React.RefObject<HTMLDivElement>;
   inputRef: React.RefObject<HTMLInputElement>;
@@ -35,7 +36,7 @@ export class ContentEditable extends React.Component<Props> {
     const text = e.clipboardData.getData("text/plain");
 
     // Insert text manually from paste command
-    document.execCommand("insertHTML", false, removeLineBreaks(text));
+    document.execCommand("insertHTML", false, safeHtmlString(text));
 
   }
 
@@ -113,7 +114,7 @@ export class ContentEditable extends React.Component<Props> {
   }
 
   render() {
-    const { className, innerEditableRef } = this.props;
+    const { value, className, innerEditableRef } = this.props;
     return (
       <div
         ref={innerEditableRef}
@@ -123,6 +124,7 @@ export class ContentEditable extends React.Component<Props> {
         onFocus={this.onFocus}
         onBlur={this.onBlur}
         onKeyDown={this.onKeyDown}
+        dangerouslySetInnerHTML={{ __html: safeHtmlString(value) }}
       />
     );
   }

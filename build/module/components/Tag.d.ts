@@ -10,10 +10,8 @@ interface Props {
     validator?: (val: string) => boolean;
     removeOnBackspace?: boolean;
 }
-export declare class Tag extends React.PureComponent<Props> {
+export declare class Tag extends React.Component<Props> {
     innerEditableRef: React.RefObject<HTMLDivElement>;
-    componentDidMount(): void;
-    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void;
     remove: () => void;
     render(): JSX.Element;
 }

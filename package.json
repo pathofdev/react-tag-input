@@ -1,7 +1,7 @@
 {
   "name": "@pathofdev/react-tag-input",
   "version": "1.0.4",
-  "description": "A simple tag input component for React",
+  "description": "A simple tag input component for React with editable tags",
   "main": "./build/umd/index.min.js",
   "module": "./build/module/index.js",
   "types": "./build/module/index.d.ts",

@@ -1,7 +1,6 @@
 import React from "react";
 import {classSelectors} from "../utils/selectors";
 import {ContentEditable} from "./ContentEditable";
-import {removeLineBreaks} from "../utils/functions";
 
 interface Props {
   value: string;
@@ -15,28 +14,9 @@ interface Props {
   removeOnBackspace?: boolean;
 }
 
-export class Tag extends React.PureComponent<Props> {
+export class Tag extends React.Component<Props> {
 
   innerEditableRef: React.RefObject<HTMLDivElement> = React.createRef();
-
-  componentDidMount() {
-    const ref = this.innerEditableRef.current;
-    if (ref) {
-      ref.innerText = removeLineBreaks(this.props.value);
-    }
-  }
-
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any) {
-    const ref = this.innerEditableRef.current;
-    if (ref) {
-      const changedValue = prevProps.value !== this.props.value;
-      const changedEditable = prevProps.editable !== this.props.editable;
-      const update = changedValue || changedEditable;
-      if (update) {
-        ref.innerText = removeLineBreaks(this.props.value);
-      }
-    }
-  }
 
   remove = () => this.props.remove(this.props.index);
 
@@ -52,6 +32,7 @@ export class Tag extends React.PureComponent<Props> {
         {!editable && <div className={classSelectors.tagContent}>{value}</div>}
         {editable && (
           <ContentEditable
+            value={value}
             inputRef={inputRef}
             innerEditableRef={this.innerEditableRef}
             className={classSelectors.tagContent}
