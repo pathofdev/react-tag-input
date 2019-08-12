@@ -21,10 +21,11 @@
     "example": "parcel ./example/index.html"
   },
   "keywords": [
+    "input tag",
     "tag input",
-    "react",
-    "react tag input",
-    "react input tag"
+    "react input tag",
+    "react tag input component",
+    "react tag input"
   ],
   "author": "pathof.dev",
   "license": "MIT",

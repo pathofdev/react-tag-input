@@ -49,7 +49,7 @@ $reactTagMarginPadding: 0.1875em;
     box-shadow: none;
     -webkit-appearance: none;
 
-    &:-moz-placeholder, &:-ms-input-placeholder, &::-moz-placeholder, &::-webkit-input-placeholder {
+    &::placeholder, &:-moz-placeholder, &:-ms-input-placeholder, &::-moz-placeholder, &::-webkit-input-placeholder {
       color: $reactTagColorText;
     }
     &:focus {

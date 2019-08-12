@@ -27,7 +27,6 @@ var Tag = (function (_super) {
         var ref = this.innerEditableRef.current;
         if (ref) {
             ref.innerText = removeLineBreaks(this.props.value);
-            console.log("componentDidMount", ref.innerText);
         }
     };
     Tag.prototype.componentDidUpdate = function (prevProps, prevState, snapshot) {
@@ -38,7 +37,6 @@ var Tag = (function (_super) {
             var update = changedValue || changedEditable;
             if (update) {
                 ref.innerText = removeLineBreaks(this.props.value);
-                console.log("componentDidUpdate", ref.innerText);
             }
         }
     };

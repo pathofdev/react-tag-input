@@ -23,7 +23,6 @@ export class Tag extends React.PureComponent<Props> {
     const ref = this.innerEditableRef.current;
     if (ref) {
       ref.innerText = removeLineBreaks(this.props.value);
-      console.log("componentDidMount", ref.innerText);
     }
   }
 
@@ -35,7 +34,6 @@ export class Tag extends React.PureComponent<Props> {
       const update = changedValue || changedEditable;
       if (update) {
         ref.innerText = removeLineBreaks(this.props.value);
-        console.log("componentDidUpdate", ref.innerText);
       }
     }
   }
