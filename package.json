@@ -7,6 +7,7 @@
   "types": "./build/module/index.d.ts",
   "private": false,
   "sideEffects": false,
+  "homepage": "https://pathof.dev/projects/react-tag-input",
   "repository": {
     "type": "git",
     "url": "https://github.com/pathofdev/react-tag-input"
