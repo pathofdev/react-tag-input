@@ -9,7 +9,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/path-of-dev/react-tag-input"
+    "url": "https://github.com/pathofdev/react-tag-input"
   },
   "scripts": {
     "module-build": "tsc",
