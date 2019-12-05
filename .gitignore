@@ -11,6 +11,7 @@ lerna-debug.log*
 .idea/
 
 dist/
+build/
 
 keys/
 
