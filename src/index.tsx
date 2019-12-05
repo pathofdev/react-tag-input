@@ -71,8 +71,10 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
 
   addTag = (value: string) => {
     const tags = [ ...this.props.tags ];
-    tags.push(value);
-    this.props.onChange(tags);
+    if (!tags.includes(value)) {
+      tags.push(value);
+      this.props.onChange(tags);
+    }
     this.setState({ input: "" });
   }
 
