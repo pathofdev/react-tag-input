@@ -71,8 +71,10 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
 
   addTag = (value: string) => {
     const tags = [ ...this.props.tags ];
-    tags.push(value);
-    this.props.onChange(tags);
+    if (!tags.includes(value)) {
+      tags.push(value);
+      this.props.onChange(tags);
+    }
     this.setState({ input: "" });
   }
 
@@ -84,7 +86,12 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
 
   updateTag = (i: number, value: string) => {
     const tags = [...this.props.tags];
-    tags[i] = value;
+    const numOccurencesOfValue = tags.reduce((prev, currentValue, index) => prev + (currentValue === value && index !== i ? 1 : 0) , 0);
+    if (numOccurencesOfValue > 0) {
+      tags.splice(i, 1);
+    } else {
+      tags[i] = value;
+    }
     this.props.onChange(tags);
   }
 
