@@ -1,10 +1,10 @@
 
-$reactTagColorGray: #e1e1e1;
-$reactTagColorText: #333;
-$reactTagHeight: 2.375em;
-$reactTagFontSize: 1em;
-$reactTagBorderRadius: 3px;
-$reactTagMarginPadding: 0.1875em;
+$reactTagColorGray: #e1e1e1 !default;
+$reactTagColorText: #333 !default;
+$reactTagHeight: 2.375em !default;
+$reactTagFontSize: 1em !default;
+$reactTagBorderRadius: 3px !default;
+$reactTagMarginPadding: 0.1875em !default;
 
 .react-tag-input {
 
