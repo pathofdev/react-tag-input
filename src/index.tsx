@@ -15,8 +15,8 @@ export interface ReactTagInputProps {
   removeOnBackspace?: boolean;
   buttonVariant?: boolean;
   buttonStyle?: CSSProperties;
-  removeButtonText?: string;
-  addButtonText?: string;
+  removeButtonText?: (() => any) | string;
+  addButtonText?: (() => any) | string;
 }
 
 interface State {
@@ -141,6 +141,8 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
 
     const showInput = !readOnly && !maxTagsReached;
 
+    // @ts-ignore
+    // @ts-ignore
     return (
       <div className={classSelectors.wrapper}>
         {tags.map((tag, i) => (
@@ -171,10 +173,10 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
         {buttonVariant &&
         <>
           <button style={buttonStyle} onClick={this.onButtonDelete}>
-            {removeButtonText || "Delete"}
+            { typeof removeButtonText === "string" ? removeButtonText : removeButtonText ? removeButtonText() : "Remove"}
           </button>
           <button style={buttonStyle} onClick={this.onButtonAdd}>
-            {addButtonText || "Add"}
+            { typeof addButtonText === "string" ? addButtonText : addButtonText ? addButtonText() : "Add"}
           </button>
         </>
         }

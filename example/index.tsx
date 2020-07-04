@@ -27,6 +27,9 @@ function Example() {
         {...settings}
         tags={tags}
         onChange={(value) => setTags(value)}
+        buttonVariant={true}
+        addButtonText={() => <span>Add!</span>}
+        removeButtonText={"Remove!"}
       />
 
       <div className="form">
