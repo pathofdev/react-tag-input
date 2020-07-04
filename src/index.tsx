@@ -14,8 +14,9 @@ export interface ReactTagInputProps {
   readOnly?: boolean;
   removeOnBackspace?: boolean;
   buttonVariant?: boolean;
-  buttonText?: string;
   buttonStyle?: CSSProperties;
+  removeButtonText?: string;
+  addButtonText?: string;
 }
 
 interface State {
@@ -132,7 +133,7 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
 
     const {input} = this.state;
 
-    const {tags, placeholder, maxTags, editable, readOnly, validator, removeOnBackspace, buttonVariant, buttonText, buttonStyle} = this.props;
+    const {tags, placeholder, maxTags, editable, readOnly, validator, removeOnBackspace, buttonVariant, addButtonText, removeButtonText, buttonStyle} = this.props;
 
     const maxTagsReached = maxTags !== undefined ? tags.length >= maxTags : false;
 
@@ -170,10 +171,10 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
         {buttonVariant &&
         <>
           <button style={buttonStyle} onClick={this.onButtonDelete}>
-            {buttonText || "Delete"}
+            {removeButtonText || "Delete"}
           </button>
           <button style={buttonStyle} onClick={this.onButtonAdd}>
-            {buttonText || "Add"}
+            {addButtonText || "Add"}
           </button>
         </>
         }
