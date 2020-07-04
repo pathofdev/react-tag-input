@@ -164,7 +164,7 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
             ref={this.inputRef}
             value={input}
             className={classSelectors.input}
-            placeholder={placeholder || "Type and press enter"}
+            placeholder={ tags.length === 0 ? placeholder || "Type and press enter" : "" }
             onChange={this.onInputChange}
             onKeyDown={this.onInputKeyDown}
         />
