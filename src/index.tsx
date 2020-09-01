@@ -1,4 +1,4 @@
-import React from "react";
+import React, {CSSProperties} from "react";
 import {Tag} from "./components/Tag";
 import {classSelectors} from "./utils/selectors";
 
@@ -13,6 +13,10 @@ export interface ReactTagInputProps {
   editable?: boolean;
   readOnly?: boolean;
   removeOnBackspace?: boolean;
+  buttonVariant?: boolean;
+  buttonStyle?: CSSProperties;
+  removeButtonText?: (() => any) | string;
+  addButtonText?: (() => any) | string;
 }
 
 interface State {
@@ -21,19 +25,19 @@ interface State {
 
 export default class ReactTagInput extends React.Component<ReactTagInputProps, State> {
 
-  state = { input: "" };
+  state = {input: ""};
 
   // Ref for input element
   inputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
   onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ input: e.target.value });
+    this.setState({input: e.target.value});
   }
 
   onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
-    const { input } = this.state;
-    const { validator, removeOnBackspace } = this.props;
+    const {input} = this.state;
+    const {validator, removeOnBackspace} = this.props;
 
     // On enter
     if (e.keyCode === 13) {
@@ -42,7 +46,9 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
       e.preventDefault();
 
       // If input is blank, do nothing
-      if (input === "") { return; }
+      if (input === "") {
+        return;
+      }
 
       // Check if input is valid
       const valid = validator !== undefined ? validator(input) : true;
@@ -69,24 +75,52 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
 
   }
 
+  onButtonAdd = () => {
+    const {input} = this.state;
+    const {validator} = this.props;
+
+    // If input is blank, do nothing
+    if (input === "") {
+      return;
+    }
+
+    // Check if input is valid
+    const valid = validator !== undefined ? validator(input) : true;
+    if (!valid) {
+      return;
+    }
+
+    this.addTag(input);
+
+  }
+
+  onButtonDelete = () => {
+    const {input} = this.state;
+    if (input !== "") {
+      return;
+    }
+    this.removeTag(this.props.tags.length - 1);
+
+  }
+
   addTag = (value: string) => {
-    const tags = [ ...this.props.tags ];
+    const tags = [...this.props.tags];
     if (!tags.includes(value)) {
       tags.push(value);
       this.props.onChange(tags);
     }
-    this.setState({ input: "" });
+    this.setState({input: ""});
   }
 
   removeTag = (i: number) => {
-    const tags = [ ...this.props.tags ];
+    const tags = [...this.props.tags];
     tags.splice(i, 1);
     this.props.onChange(tags);
   }
 
   updateTag = (i: number, value: string) => {
     const tags = [...this.props.tags];
-    const numOccurencesOfValue = tags.reduce((prev, currentValue, index) => prev + (currentValue === value && index !== i ? 1 : 0) , 0);
+    const numOccurencesOfValue = tags.reduce((prev, currentValue, index) => prev + (currentValue === value && index !== i ? 1 : 0), 0);
     if (numOccurencesOfValue > 0) {
       tags.splice(i, 1);
     } else {
@@ -97,9 +131,9 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
 
   render() {
 
-    const { input } = this.state;
+    const {input} = this.state;
 
-    const { tags, placeholder, maxTags, editable, readOnly, validator, removeOnBackspace } = this.props;
+    const {tags, placeholder, maxTags, editable, readOnly, validator, removeOnBackspace, buttonVariant, addButtonText, removeButtonText, buttonStyle} = this.props;
 
     const maxTagsReached = maxTags !== undefined ? tags.length >= maxTags : false;
 
@@ -107,6 +141,8 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
 
     const showInput = !readOnly && !maxTagsReached;
 
+    // @ts-ignore
+    // @ts-ignore
     return (
       <div className={classSelectors.wrapper}>
         {tags.map((tag, i) => (
@@ -124,14 +160,25 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
           />
         ))}
         {showInput &&
-          <input
+        <input
             ref={this.inputRef}
             value={input}
             className={classSelectors.input}
-            placeholder={placeholder || "Type and press enter"}
+            placeholder={ tags.length === 0 ? placeholder || "Type and press enter" : "" }
             onChange={this.onInputChange}
             onKeyDown={this.onInputKeyDown}
-          />
+        />
+        }
+
+        {buttonVariant &&
+        <>
+          <button style={buttonStyle} onClick={this.onButtonDelete}>
+            { typeof removeButtonText === "string" ? removeButtonText : removeButtonText ? removeButtonText() : "Remove"}
+          </button>
+          <button style={buttonStyle} onClick={this.onButtonAdd}>
+            { typeof addButtonText === "string" ? addButtonText : addButtonText ? addButtonText() : "Add"}
+          </button>
+        </>
         }
       </div>
     );
