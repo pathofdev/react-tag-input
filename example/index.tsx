@@ -8,13 +8,13 @@ const root = document.getElementById("root");
 const initialSettings: ReactTagInputProps = {
   tags: [],
   onChange: (tags) => {},
-  placeholder: "Types and press enter",
+  placeholder: "Type and press enter, tab, space or comma",
   maxTags: 10,
   editable: true,
   readOnly: false,
   removeOnBackspace: true,
   validator: undefined,
-  additionalKeycodes: [9, 32, 188]
+  additionalKeycodes: [9, 32, 188] // tab, space, comma
 };
 
 function Example() {
