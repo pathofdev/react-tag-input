@@ -3,6 +3,7 @@ import {Tag} from "./components/Tag";
 import {classSelectors} from "./utils/selectors";
 
 type Tags = string[];
+type Keycodes = number[];
 
 export interface ReactTagInputProps {
   tags: Tags;
@@ -13,6 +14,7 @@ export interface ReactTagInputProps {
   editable?: boolean;
   readOnly?: boolean;
   removeOnBackspace?: boolean;
+  additionalKeycodes?: Keycodes;
 }
 
 interface State {
@@ -35,8 +37,8 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
     const { input } = this.state;
     const { validator, removeOnBackspace } = this.props;
 
-    // On enter
-    if (e.keyCode === 13) {
+    // On enter, or one of the additional keycodes from props
+    if (e.keyCode === 13 || this.props?.additionalKeycodes?.includes(e.keyCode)) {
 
       // Prevent form submission if tag input is nested in <form>
       e.preventDefault();

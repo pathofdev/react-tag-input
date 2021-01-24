@@ -14,6 +14,7 @@ const initialSettings: ReactTagInputProps = {
   readOnly: false,
   removeOnBackspace: true,
   validator: undefined,
+  additionalKeycodes: [9, 32, 188]
 };
 
 function Example() {
