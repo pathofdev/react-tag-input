@@ -14,6 +14,7 @@ const initialSettings: ReactTagInputProps = {
   readOnly: false,
   removeOnBackspace: true,
   validator: undefined,
+  separatorKeys: undefined
 };
 
 function Example() {
@@ -25,6 +26,8 @@ function Example() {
       <ReactTagInput
         {...settings}
         tags={tags}
+        // Testing keys space:32, tab:9, comma:188
+        separatorKeys={[32, 9, 188]}
         onChange={(value) => setTags(value)}
       />
 
