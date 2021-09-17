@@ -13,6 +13,7 @@ export interface ReactTagInputProps {
   editable?: boolean;
   readOnly?: boolean;
   removeOnBackspace?: boolean;
+  separatorKeys?: Array<number>;
 }
 
 interface State {
@@ -30,13 +31,33 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
     this.setState({ input: e.target.value });
   }
 
+   onBlur = () => {
+    const { input } = this.state;
+    const { validator } = this.props;
+
+    // If input is blank, do nothing
+    if (input === "") {
+      return;
+    }
+
+    // Check if input is valid
+    const valid = validator !== undefined ? validator(input) : true;
+    if (!valid) {
+      return;
+    }
+
+    // Add input to tag list
+    this.addTag(input);
+  };
+
+
   onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 
     const { input } = this.state;
-    const { validator, removeOnBackspace } = this.props;
+    const { validator, removeOnBackspace, separatorKeys = [] } = this.props;
 
-    // On enter
-    if (e.keyCode === 13) {
+    // On enter or other separator keys
+    if ([13, ...separatorKeys].includes(e.keyCode)) {
 
       // Prevent form submission if tag input is nested in <form>
       e.preventDefault();
@@ -126,6 +147,7 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
         {showInput &&
           <input
             ref={this.inputRef}
+            onBlur={this.onBlur}
             value={input}
             className={classSelectors.input}
             placeholder={placeholder || "Type and press enter"}
