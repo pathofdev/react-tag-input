@@ -1,33 +1,26 @@
-import React from "react";
-import {safeHtmlString} from "../utils/functions";
+import React, { useEffect, useRef, useState } from "react";
+import { safeHtmlString } from "../utils/functions";
 
 interface Props {
   value: string;
   className: string;
-  innerEditableRef: React.RefObject<HTMLDivElement>;
-  inputRef: React.RefObject<HTMLInputElement>;
   change: (value: string) => void;
   remove: () => void;
   validator?: (value: string) => boolean;
   removeOnBackspace?: boolean;
 }
 
-export class ContentEditable extends React.Component<Props> {
+const ContentEditable = React.forwardRef<HTMLInputElement, Props>(({ value, className, change, remove, validator, removeOnBackspace }, ref) => {
 
-  // Track focus state of editable tag
-  focused: boolean = false;
+  const innerEditableRef = useRef() as React.MutableRefObject<HTMLDivElement>;
+  const [removed, setRemoved] = useState(false);
+  const [preFocusedValue, setPreFocusedValue] = useState("");
 
-  // Track if element has been removed from DOM
-  removed: boolean = false;
+  useEffect(() => {
+    setPreFocusedValue(getValue());
+  }, []);
 
-  // Save value before input is focused / user starts typing
-  preFocusedValue: string = "";
-
-  componentDidMount() {
-    this.preFocusedValue = this.getValue();
-  }
-
-  onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+  const onPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
 
     // Cancel paste event
     e.preventDefault();
@@ -40,93 +33,80 @@ export class ContentEditable extends React.Component<Props> {
 
   }
 
-  onFocus = () => {
-    this.preFocusedValue = this.getValue();
-    this.focused = true;
+  // When we focus on the div, get it's text value.
+  const onFocus = () => {
+    setPreFocusedValue(getValue());
   }
 
-  onBlur = () => {
 
-    this.focused = false;
+  const onBlur = () => {
+    const ref = innerEditableRef.current;
 
-    const ref = this.props.innerEditableRef.current;
-    const { validator, change } = this.props;
-
-    if (!this.removed && ref) {
-
+    if (!removed && ref) {
       // On blur, if no content in tag, remove it
       if (ref.innerText === "") {
-        this.props.remove();
+        remove();
         return;
       }
 
       // Validate input if needed
       if (validator) {
-        const valid = validator(this.getValue());
+        const valid = validator(getValue());
         // If invalidate, switch ref back to pre focused value
         if (!valid) {
-          ref.innerText = this.preFocusedValue;
+          ref.innerText = preFocusedValue;
           return;
         }
       }
-
       change(ref.innerText);
-
     }
-
   }
 
-  onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
 
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     // On enter, focus main tag input
-    if (e.keyCode === 13) {
+    const key = e.key || e.keyCode;
+    if (key === 13 || key === 188 || key === 'Enter' || key === ',') {
       e.preventDefault();
-      this.focusInputRef();
+      focusInputRef();
       return;
     }
 
     // On backspace, if no content in ref, remove tag and focus main tag input
-    const { removeOnBackspace } = this.props;
-    const value = this.getValue();
-    if (removeOnBackspace && e.keyCode === 8 && value === "") {
-      this.removed = true;
-      this.props.remove();
-      this.focusInputRef();
+    const value = getValue();
+    if (removeOnBackspace && (key === 8 || key === 'Backspace') && value === "") {
+      setRemoved(true);
+      remove();
+      focusInputRef();
       return;
     }
-
   }
 
-  getValue = () => {
-    const ref = this.getRef();
+  const getValue = () => {
+    const ref = innerEditableRef.current;
     return ref ? ref.innerText : "";
   }
 
-  getRef = () => {
-    return this.props.innerEditableRef.current;
-  }
 
-  focusInputRef = () => {
-    const { inputRef } = this.props;
-    if (inputRef && inputRef.current) {
-      inputRef.current.focus();
+  const focusInputRef = () => {
+    if (ref && typeof ref !== 'function' && ref?.current) {
+      ref?.current?.focus();
     }
   }
 
-  render() {
-    const { value, className, innerEditableRef } = this.props;
-    return (
-      <div
-        ref={innerEditableRef}
-        className={className}
-        contentEditable={true}
-        onPaste={this.onPaste}
-        onFocus={this.onFocus}
-        onBlur={this.onBlur}
-        onKeyDown={this.onKeyDown}
-        dangerouslySetInnerHTML={{ __html: safeHtmlString(value) }}
-      />
-    );
-  }
+  return (
+    <div
+      ref={innerEditableRef}
+      className={className}
+      contentEditable={true}
+      onPaste={onPaste}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      onKeyDown={onKeyDown}
+      dangerouslySetInnerHTML={{ __html: safeHtmlString(value) }}
+    ></div>
+  )
 
-}
+});
+
+export default ContentEditable;

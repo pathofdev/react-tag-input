@@ -1,6 +1,6 @@
-import React from "react";
-import {Tag} from "./components/Tag";
-import {classSelectors} from "./utils/selectors";
+import React, { useRef, useState } from "react";
+import Tag from "./components/Tag";
+import { classSelectors } from "./utils/selectors";
 
 type Tags = string[];
 
@@ -13,30 +13,26 @@ export interface ReactTagInputProps {
   editable?: boolean;
   readOnly?: boolean;
   removeOnBackspace?: boolean;
+  wrapperClass?: string;
+  inputClass?: string;
+  [x: string]: any; // Allow for any additional props
 }
 
-interface State {
-  input: string;
-}
+const ReactTagInput = React.forwardRef<HTMLInputElement, ReactTagInputProps>(({ tags, onChange, placeholder, maxTags, validator, editable, readOnly, removeOnBackspace, wrapperClass, inputClass, ...rest }, ref) => {
 
-export default class ReactTagInput extends React.Component<ReactTagInputProps, State> {
-
-  state = { input: "" };
+  const [input, setInput] = useState<string>("");
 
   // Ref for input element
-  inputRef: React.RefObject<HTMLInputElement> = React.createRef();
+  const inputRef = useRef() as React.MutableRefObject<HTMLInputElement> || ref;
 
-  onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ input: e.target.value });
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
   }
 
-  onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-
-    const { input } = this.state;
-    const { validator, removeOnBackspace } = this.props;
-
+  const onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     // On enter
-    if (e.keyCode === 13) {
+    const key = e.key || e.keyCode;
+    if (key === 13 || key === 188 || key === 'Enter' || key === ',') {
 
       // Prevent form submission if tag input is nested in <form>
       e.preventDefault();
@@ -51,11 +47,10 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
       }
 
       // Add input to tag list
-      this.addTag(input);
-
+      addTag(input);
     }
     // On backspace or delete
-    else if (removeOnBackspace && (e.keyCode === 8 || e.keyCode === 46)) {
+    else if (removeOnBackspace && (key === 8 || key === 46 || key === 'Backspace' || key === 'Delete')) {
 
       // If currently typing, do nothing
       if (input !== "") {
@@ -63,79 +58,71 @@ export default class ReactTagInput extends React.Component<ReactTagInputProps, S
       }
 
       // If input is blank, remove previous tag
-      this.removeTag(this.props.tags.length - 1);
-
+      removeTag(tags.length - 1);
     }
-
   }
 
-  addTag = (value: string) => {
-    const tags = [ ...this.props.tags ];
-    if (!tags.includes(value)) {
-      tags.push(value);
-      this.props.onChange(tags);
+  const addTag = (value: string) => {
+    const newTags = [...tags];
+    if (!newTags.includes(value)) {
+      newTags.push(value);
+      onChange(newTags);
     }
-    this.setState({ input: "" });
+    setInput('');
   }
 
-  removeTag = (i: number) => {
-    const tags = [ ...this.props.tags ];
-    tags.splice(i, 1);
-    this.props.onChange(tags);
+  const removeTag = (i: number) => {
+    const newTags = [...tags];
+    newTags.splice(i, 1);
+    onChange(newTags);
   }
 
-  updateTag = (i: number, value: string) => {
-    const tags = [...this.props.tags];
-    const numOccurencesOfValue = tags.reduce((prev, currentValue, index) => prev + (currentValue === value && index !== i ? 1 : 0) , 0);
+  const updateTag = (i: number, value: string) => {
+    const newTags = [...tags];
+    const numOccurencesOfValue = newTags.reduce((prev, currentValue, index) => prev + (currentValue === value && index !== i ? 1 : 0), 0);
     if (numOccurencesOfValue > 0) {
-      tags.splice(i, 1);
+      newTags.splice(i, 1);
     } else {
-      tags[i] = value;
+      newTags[i] = value;
     }
-    this.props.onChange(tags);
+    onChange(newTags);
   }
 
-  render() {
+  const maxTagsReached = maxTags !== undefined ? tags.length >= maxTags : false;
 
-    const { input } = this.state;
+  const isEditable = readOnly ? false : (editable || false);
 
-    const { tags, placeholder, maxTags, editable, readOnly, validator, removeOnBackspace } = this.props;
+  const showInput = !readOnly && !maxTagsReached;
 
-    const maxTagsReached = maxTags !== undefined ? tags.length >= maxTags : false;
+  return (
+    <div className={`${classSelectors.wrapper} ${wrapperClass}`}>
+      {tags.map((tag, i) => (
+        <Tag
+          key={i}
+          value={tag}
+          index={i}
+          editable={isEditable}
+          readOnly={readOnly || false}
+          ref={inputRef}
+          update={updateTag}
+          remove={removeTag}
+          validator={validator}
+          removeOnBackspace={removeOnBackspace}
+        />
+      ))}
+      {showInput &&
+        <input
+          ref={inputRef}
+          value={input}
+          className={`${classSelectors.input} ${inputClass}`}
+          placeholder={placeholder || "Type and press enter"}
+          onChange={onInputChange}
+          onKeyDown={onInputKeyDown}
+          {...rest}
+        />
+      }
+    </div>
+  );
+});
 
-    const isEditable = readOnly ? false : (editable || false);
-
-    const showInput = !readOnly && !maxTagsReached;
-
-    return (
-      <div className={classSelectors.wrapper}>
-        {tags.map((tag, i) => (
-          <Tag
-            key={i}
-            value={tag}
-            index={i}
-            editable={isEditable}
-            readOnly={readOnly || false}
-            inputRef={this.inputRef}
-            update={this.updateTag}
-            remove={this.removeTag}
-            validator={validator}
-            removeOnBackspace={removeOnBackspace}
-          />
-        ))}
-        {showInput &&
-          <input
-            ref={this.inputRef}
-            value={input}
-            className={classSelectors.input}
-            placeholder={placeholder || "Type and press enter"}
-            onChange={this.onInputChange}
-            onKeyDown={this.onInputKeyDown}
-          />
-        }
-      </div>
-    );
-
-  }
-
-}
+export default ReactTagInput;

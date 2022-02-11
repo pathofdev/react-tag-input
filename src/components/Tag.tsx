@@ -1,51 +1,42 @@
 import React from "react";
-import {classSelectors} from "../utils/selectors";
-import {ContentEditable} from "./ContentEditable";
+import { classSelectors } from "../utils/selectors";
+import ContentEditable from "./ContentEditable";
 
 interface Props {
   value: string;
   index: number;
   editable: boolean;
   readOnly: boolean;
-  inputRef: React.RefObject<HTMLInputElement>;
   update: (i: number, value: string) => void;
   remove: (i: number) => void;
   validator?: (val: string) => boolean;
   removeOnBackspace?: boolean;
 }
 
-export class Tag extends React.Component<Props> {
+const Tag = React.forwardRef<HTMLInputElement, Props>(({ value, index, editable, readOnly, update, remove, validator, removeOnBackspace }, ref) => {
 
-  innerEditableRef: React.RefObject<HTMLDivElement> = React.createRef();
+  const removeTag = () => remove(index);
 
-  remove = () => this.props.remove(this.props.index);
+  const tagRemoveClass = !readOnly ?
+    classSelectors.tagRemove : `${classSelectors.tagRemove} ${classSelectors.tagRemoveReadOnly}`;
 
-  render() {
+  return (
+    <div className={classSelectors.tag}>
+      {!editable && <div className={classSelectors.tagContent}>{value}</div>}
+      {editable && (
+        <ContentEditable
+          value={value}
+          ref={ref}
+          className={classSelectors.tagContent}
+          change={(newValue) => update(index, newValue)}
+          remove={removeTag}
+          validator={validator}
+          removeOnBackspace={removeOnBackspace}
+        />
+      )}
+      <div className={tagRemoveClass} onClick={removeTag} ></div>
+    </div>
+  );
+});
 
-    const { value, index, editable, inputRef, validator, update, readOnly, removeOnBackspace } = this.props;
-
-    const tagRemoveClass = !readOnly ?
-      classSelectors.tagRemove : `${classSelectors.tagRemove} ${classSelectors.tagRemoveReadOnly}`;
-
-    return (
-      <div className={classSelectors.tag}>
-        {!editable && <div className={classSelectors.tagContent}>{value}</div>}
-        {editable && (
-          <ContentEditable
-            value={value}
-            inputRef={inputRef}
-            innerEditableRef={this.innerEditableRef}
-            className={classSelectors.tagContent}
-            change={(newValue) => update(index, newValue)}
-            remove={this.remove}
-            validator={validator}
-            removeOnBackspace={removeOnBackspace}
-          />
-        )}
-        <div className={tagRemoveClass} onClick={this.remove}/>
-      </div>
-    );
-
-  }
-
-}
+export default Tag;
