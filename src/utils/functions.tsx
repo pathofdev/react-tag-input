@@ -15,7 +15,7 @@ const htmlEntityMap = {
   "=": "&#x3D;",
 };
 export function escapeHtml(value: string) {
-  return String(value).replace(/[&<>"'`=\/]/g, (s) => {
+  return String(value).replace(/[&<>"'`=/]/g, (s) => {
     // @ts-ignore
     return htmlEntityMap[s];
   });
